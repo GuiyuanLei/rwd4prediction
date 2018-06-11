@@ -1,0 +1,425 @@
+---
+title: "Predict survival for cancer patients using real world data: simple model or advanced machine learning?"
+subtitle: "PSI conference 2018, Amsterdam, Netherlands"
+author: "Guiyuan Lei, Saeed Rafii and Kenji Hashimoto<br /> Roche Products Limited"
+date: "4th June 2018"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+# Outline
+
+- Commonly used tools/methods for survival prediction
+
+???
+
+In this presentation, I am going to talk about using real world data to predict survival for cancer patients. First I will briefly mention commonly used tools/methods for survival prediction.
+
+--
+
+- One real example: Roche RAAD Challenge
+  + The advantage of the data and challenge of the problem
+  + Approaches from different teams
+  + Comparing simple model vs advanced machine learning 
+
+???
+
+Then I will use one real example from Roche internal challenge to discuss the advantage of the data, challenge of the problem, the approaches used for prediction, and comparing simple model vs advanced machine learning.
+
+--
+
+- Summary/Learnings
+
+???
+
+Finally summary and learnings.
+
+---
+
+# Commonly used tools/methods for survival prediction
+
+.pull-left[
+- Two well-known survival prediction tool for eBC patients (Cox-regression model, meta-analyses)
+  + Adjuvant! Online
+  + Predict
+]
+
+.pull-right[
+![predict](predict.jpg)
+]
+
+???
+
+There are many online prediction tools for cancer survival. Two well-known survival prediction tools for early Breast Cancer patients are called Adjuvant Online and Predict. The tools used meta-analysis or Cox-regression to build a model, once doctors enter the value of prognosis factor for individual patient, the probability of survival (for 5 years or 10 years) is calculated. Please note those two tools use only a handful of prognosis factors for prediction.
+
+--
+
+- Commonly used Machine Learning Methods for survival prediction
+
+  + Artificial Neural Networks (ANNs)
+  + Support Vector Machines (SVMs)
+  + Bayesian Networks (BNs)
+  + Decision Trees (DTs)
+  + ...
+
+???
+
+On the other hand, different machine learning methods are used to build prediction models. Those methods include artificial neural networks, support vector machines, Bayesian networks, decision trees and many more.
+   
+---
+
+class: inverse, middle, center
+
+# One real example:  Roche RAAD Challenge
+
+???
+
+Next I am going to talk about one real example of using real world data to predict survival for cancer patients. This is the Roche Advanced Analytics Data (RAAD) challenge. 
+---
+
+# The Objective of the RAAD Challenge
+
+The Roche Advanced Analytics Data (RAAD) Challenge was an internal competition within the Roche Group to predict the probability a patient will be alive at 1 year after treatment initiation, using Flatiron electronic health record data.
+
+![participants](participants.jpg)
+
+???
+
+Let me start with the objective of the challenge.
+
+The Roche Advanced Analytics Data (RAAD) Challenge was an internal competition within the Roche Group to predict the probability a patient will be alive at 1 year after treatment initiation, using Flatiron electronic health record data. All the patient data are available up to the start of treatment. The endpoint is a binary variable, 1 for death, 0 for alive at one year.
+
+500 people from across the Roche Group signed up to take part, across Diagnostics, Pharma and Group Functions. Of the 132 teams that signed up, 81 teams from 19 Roche sites successfully built a model.
+
+---
+
+# Flatiron Data
+
+- The Flatiron Health database is a longitudinal, demographically and geographically diverse database derived from electronic health record (EHR) data
+
+--
+
+- The database includes data from over 265 cancer clinics (~800 sites of care) representing more than 2 million active US cancer patients available for analysis
+
+--
+
+- This challenge utilized a random sample of the Flatiron Health EHR-derived database and included 10500 patients (7000 for training and 3500 for testing) diagnosed with 7 different cancer types. The treatment information was not included in challenge.
+
+--
+
+- Patient-level data include structured and unstructured data, curated via technology-enabled abstraction
+
+--
+
+- Data provided are de-identified and provisions are in place to prevent re-identification in order to protect patients’ confidentiality
+
+---
+
+class: inverse, middle, center
+
+# RAAD Challenge: The advantage of the data and challenge of the problem
+
+---
+
+# The advantage of the data and challenge of the problem
+
+- Advantages of the data 
+  + There were 20 datasets including generic tables and indication specific tables (demo, biomarker, metastatic information etc for 7 different cancer types)
+  
+  + Wealthy data, for example, there were ~120 lab variables/parameters, some of them have multiple time points (longitudinal data)
+
+???
+
+Types of cancers:
+
+- Advanced Melanoma
+- NSCLC
+- Bladder Cancer
+- Breast Cancer 
+- Colorectal Cancer (CRC)
+- CLL
+- Multiple Myeloma
+
+--
+
+- Challenge of the problem: 
+  + Data is imbalanced/skewed in regards to percentage of patients dead or alive.  For CLL, only 10% patients have died within one year.
+  
+  + The percentage of missing data is higher than clinical trials for some variables (ECOG-PS, lab, biomarker etc)
+
+---
+
+# ECOG-PS is sometimes missing in real world
+
+![ecog](ecog.jpg)
+
+In clinical trials we use specially designed measures to describe a patient’s health (e.g. ECOG performance status). In the real world, these measures are captured inconsistently and sometimes missing.
+
+???
+
+Here is an example of missing data in the real world setting. 
+
+In clinical trials we use specially designed measures to describe a patient’s health (e.g. ECOG performance status). In the real world, these measures are captured inconsistently and are often less relevant to physicians when making treatment decisions for the patient physically in front of them.
+
+The plot shows that among 7000 patients in training set, more than 4000 patients (around 60%) had missing a ECOG performance status. 
+
+---
+
+class: inverse, middle, center
+
+# RAAD Challenge: Approaches/Models from different teams
+
+---
+
+# Models Used in the Challenge
+
+![models](models.jpg)
+
+Decision trees were most often used methods and the winning teams used **gradient boosted decision tree** (XGBoost)
+
+???
+
+For the RAAD Challenge, different teams used different methods/model types, from traditional regression algorithms to machine learning such as Bayesian algorithms and Neural networks. As you can see from the plot, decision trees (pink colour) were the most often used methods. And the winning teams (the top 3 teams) all used gradient boosted decision tree called XGBoost.
+
+---
+
+# Nomogram approach from team “Predict”
+
+1. The potential prognostic factors were discussed and selected together by statistician and clinician scientists.
+
+???
+
+Next I am going to focus on a simple method and a machine learning method, i.e. XGBoost.
+
+Team ‘Predict’ decided to submit “Nomogram” approach for the challenge. This team consists of one statistician (myself) and two clinician scientists.
+
+Here are the steps to build the prediction models. (talk through the 5 steps)
+
+--
+
+1. The statistical models (basically **logistic regression**) were built using 80% “TRAIN” data (select variables by LASSO or relative importance)
+
+--
+
+1. The models were assessed by 20% “TRAIN” data (with known survival status)
+
+--
+
+1. The models were discussed with clinician scientists again to check if the point/score assigned for each predictor (prognostic factor) make sense or not, refine the models based on the feedback (add or remove predictors)
+
+--
+
+1. Build models using all “TRAIN” dataset and predict the probability of survival for “TEST” dataset
+
+---
+
+# Breast Cancer Example
+
+![breast](breast.jpg)
+
+???
+
+Take Breast Cancer as an example. The model includes “Tumor Type”, “CNS metastasis” and other prognosis factors. For each factor, points were assigned, for example TNBC was assigned 99 points, CNS was assigned 49 points. The total points for one patient is matched to probability of death. Say, point 297 indicate that the risk of death at 1 year would be 90%.
+
+---
+
+# XGBOOST approach that Team “NeuStat” (and other two top teams) used
+
+- XGBoost is short for “Extreme Gradient Boosting”, it is an implementation of gradient boosting decision tree algorithm
+
+???
+
+The top 3 teams all used the XGBoost approach. 
+
+… (talk through the bullet points)
+
+--
+
+- Gradient boosting is an approach where new models are created that predict the residuals or errors of prior models and then added together to make the final prediction. 
+
+--
+
+- It can handle missing data internally
+
+--
+
+- Mitigating overtraining with early stopping (or reduce bias by cross-validation and bootstrapping)
+
+--
+
+- Team NeuStat selected the top 120 features by importance while 2nd and 3rd teams used thousands of features.
+
+???
+
+While traditional approach used a small number of variables in statistical model such as logistic regression, XGBoost utilities hundreds or even thousands of features/variables.
+
+---
+
+class: inverse, middle, center
+
+# RAAD Challenge: Comparing simple model vs advanced machine learning 
+
+???
+
+Now let’s compare the performance of the simple model vs advanced machine learning, namely XGBoost.
+
+---
+
+# Model performance from team NeuStat
+
+![logloss](logloss.jpg)
+
+Team NeuStat achieved consistently high accuracy metrics across all cancer types. 
+
+
+**The formula for Log Loss for binary classification** 
+
+(*p* is predicted probability of death here, *y* is observed survival status: 0 indicating alive or 1 indicating died):
+
+$$ -(y\log(p)+(1-y)\log(1-p))$$
+
+???
+
+The model performance is evaluated using Log loss score. Each team uses their models to predict the probability of death for each patient in the testing dataset. The Log loss score is calculated using this probability and the true observed survival status.
+
+The lower the Log loss, the better the model performance. 
+
+The plot shows the Log loss score for all teams for 7 different cancer types. Team NeuStat (red dot) achieved consistently high accuracy metrics across all cancer types.
+
+---
+
+# Model performance from team NeuStat (cont.)
+
+![adjustedlogloss](adjustedlogloss.jpg)
+
+- By using adjusted log loss, you can compare the model performance across different cancer types.
+
+- Team NeuStat’s model performed best in breast cancer.
+
+???
+
+The baseline mortality rate has an effect on what log loss score you can achieve. As an example, in CLL, 1-year mortality is around 10%, which allows you to achieve a log loss score of 0.33 by assigning everyone the same probability of being alive as 0.1. In aNSCLC, the 1-year mortality is closer to 50%, so in this indication you can only achieve a log loss score of around 0.69 by assigning everyone a single probability.
+
+In order to compare the model performance across different cancer types, we looked into adjusted log loss score as well. The adjusted log loss score puts results from datasets with different response rates onto a common scale. A perfect prediction (log-loss=0) obtains a score of 1 and a prediction from the null model obtains a score of 0. 
+
+Team NeuStat’s model performed best in breast cancer.
+
+---
+
+class: center
+
+# Comparing Machine Learning vs Simple Model
+
+![teampredict](teampredict.jpg)
+
+The performance of XGBOOST (decision tree) is better than Nomogram (Logistic Regression) in regarding to LogLoss and adjusted LogLoss score
+
+???
+
+Here is the log loss score and adjusted log loss score for a simple model from team “Predict”, compared with the Winner (team “NeuStat”). The performance of XGBoost (decision tree) is better than Nomogram (Logistic Regression) .
+
+---
+
+# Comparing Machine Learning vs Simple Model (cont.)
+
+![roc](roc.jpg)
+
+The performance of XGBOOST (decision tree) is better than Nomogram (Logistic Regression) in regarding of AUC.
+
+
+???
+
+I also calculated the AUC (area under the ROC curve) for the simple model and XGBoost model. The performance of XGBoost (decision tree) is better than Nomogram (Logistic Regression) in regarding of AUC. XGBoost achieved an AUC of 0.84 while Nomogram achieved an AUC of 0.77.
+
+---
+
+# Summary/Learnings
+
+- Advanced Machine Learning outperformed traditional statistical model in this example
+  + Better performance in prediction regarding AUC (or LogLoss score)
+  + Can use wealthy data (while Lasso etc tried to reduce number of variables in the logistic regression model)
+
+???
+
+From this RAAD challenge, my summary and learnings are:
+
+In this example, advanced Machine Learning outperformed traditional statistical model, with a better performance and being able to use wealthy data. But machine learning is not as easy as traditional model to be interpreted (not bad in decision tree). 
+
+--
+
+- But machine learning is not as easy as traditional model to be interpreted
+
+???
+
+But machine learning is not as easy as traditional model to be interpreted (not bad in decision tree). 
+
+--
+
+- Common challenge, difficult to identify died patients (i.e. sensitivity is low) when the mortality rate is low. Take CLL as example (only 10% patients died within one year), team NeuStat identified 13% (9/64) died patients when using cut-off of predicted probability of death as 0.5
+
+
+???
+
+The common challenge is difficult to identify dead patients when the mortality rate is low, i.e. sensitivity is low.  Take CLL as an example, I have mentioned that only 10% patients died with one year. Even for the winning team, with low cut off of 0.5 for probability of death, they only identified 13% of dead patients. This may change if we use larger-scale data.
+
+--
+
+- With available wealthy real world data and the power of machine learning for such data, statisticians would be benefit to know machine learning methods (R packages such as “caret” and “xgboost” available)
+
+
+???
+
+Overall, with available wealthy real world data and the power of machine learning for such data, statisticians would be benefit to know machine learning methods.  R packages such as “caret” and “xgboost” are available for building models.
+
+---
+
+# Acknowledgement
+
+- Flatiron Health 
+
+???
+
+I want to acknowledge 
+
+- Flatiron Health for providing the data for the challenge.
+
+--
+
+- James Black and the Roche Advanced Analytics Data (RAAD) challenge team 
+
+???
+
+- James Black and the Roche Advanced Analytics Data (RAAD) challenge team for organizing the challenge
+
+--
+
+- The Roche RAAN (Advanced Analytics Network)
+
+???
+
+- The Roche RAAN (Advanced Analytics Network), for enthusiastically supporting 500 Roche/Genentech employees taking part in the challenge
+
+--
+
+- RAAD challenge winning team NeuStat: Andreas Reichert, Tao Xu and Ying He
+
+
+???
+
+- NeuStat, the winning team to use their results
+
+---
+
+class: inverse, middle, center
+
+# Thanks!
+guiyuan.lei@roche.com
